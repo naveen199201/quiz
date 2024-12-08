@@ -1,0 +1,92 @@
+.comprehension-quiz-question {
+    font-family: Arial, sans-serif;
+    margin-bottom: 20px;
+    font-size: 16px;
+    padding: 30px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    /* box-shadow:  0 10px rgba(0, 0, 0, 0.15); */
+  }
+  
+  .comprehension-quiz-question p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+  
+  .mcq {
+    margin-bottom: 20px;
+  }
+  
+  .mcq p {
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 10px;
+    padding: 0px 8px;
+  }
+  
+  .option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px; /* Adds space between the radio button and the label */
+    justify-content: flex-start !important; /* Ensures the label is aligned to the left */
+    background-color:  transparent !important;
+    border: 1px solid transparent !important;
+    border-radius: 0px;
+    padding: 8px 0px !important;
+  }
+  
+  .option input[type="radio"] {
+    margin: 0;
+    cursor: pointer;
+    width: 20px; /* Control the size of the radio button */
+    height: 20px;
+  }
+  
+  .option label {
+    cursor: pointer;
+    font-size: 16px;
+    display: inline-block;
+    text-align: left;
+  }
+  
+  .option input[type="radio"]:checked + label {
+    font-weight: bold;
+    /* color: #007bff; */
+  }
+  
+  .option input[type="radio"]:disabled + label {
+    color: #b0b0b0;
+  }
+  
+  .option label:hover {
+    color: #0056b3;
+    /* text-decoration: underline; */
+  }
+  
+  .option input[type="radio"]:hover + label {
+    /* color: #0056b3; */
+  }
+  
+  .reset-button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .reset-button:hover {
+    background-color: #0056b3;
+  }
+  .paragraph{
+    text-align: left;
+  }
+  .mcq-question{
+    text-align: left;
+    margin-bottom: 20px;
+  }

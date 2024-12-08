@@ -1,0 +1,20 @@
+.form-header{
+    height: 40px;
+    
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+}
+.form-header input{
+    border:none;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+    
+}
+.form-options{
+    display: flex;
+    flex-direction: row;
+    justify-content: end   ;
+    align-items: center;
+}

@@ -1,0 +1,87 @@
+.cloze-student-question {
+    font-family: Arial, sans-serif;
+    margin-bottom: 60px;
+  }
+  
+  .question-text {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  
+  .blank {
+    display: inline-block;
+    min-width: 100px;
+    padding: 20px;
+    margin: -15px 5px;
+    /* border-bottom: 2px dashed #000; */
+    text-align: center;
+    font-size: 18px;
+    /* background-color: transparent; */
+    background-color: #c1c1c1;
+    transition: background-color 0.2s;
+  }
+  
+  .blank.hovered {
+    background-color: #e0f7fa;
+    padding: 10px;
+  }
+  
+  .options-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0px;
+  }
+  
+  .option {
+    padding: 10px 15px;
+    margin: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    cursor: grab;
+    transition: background-color 0.2s, transform 0.2s;
+  }
+  
+  .option.dragging {
+    background-color: #d3d3d3;
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+  
+  .option.used {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .refresh-container {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .refresh-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .refresh-button:hover {
+    background-color: #0056b3;
+  }
+
+  /* .blank{
+    padding:20px;
+    background-color: #c1c1c1;
+    margin-top:10px;
+  }
+  .blank.hovered{
+    background-color: transparent;
+  } */
+  
