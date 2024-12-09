@@ -1,12 +1,13 @@
 import React from "react";
 import "./ComprehensionStudentQuestion.css";
 
-const ComprehensionStudentQuestion = ({ question, answer,reviewedQuestions,toggleReview, onAnswerChange }) => {
+const ComprehensionStudentQuestion = ({ question, answer,reviewedQuestions,toggleReview, onAnswerChange,onReset }) => {
   // Function to reset the answer for a specific question
   const handleReset = (index) => {
     const updatedAnswer = { ...answer };
     delete updatedAnswer[index]; // Remove the selected answer for the question
     onAnswerChange(updatedAnswer); // Notify parent about the updated answer
+    onReset();
   };
 
   const handleAnswerSelect = (qindex, selectedOption) => {
@@ -28,15 +29,18 @@ const ComprehensionStudentQuestion = ({ question, answer,reviewedQuestions,toggl
             <p className="mcq-question">
               {qindex + 1}. {mcq.text}
             </p>
+            <div style={{ display:'flex', justifyContent:'flex-end', gap: '20px'}}>
+
             <button onClick={() => toggleReview(question._id)}>
           {reviewedQuestions.includes(question._id) ? "Unmark" : "Mark for Review"}
           </button>
             <button
-              className="reset-button"
+              className="refresh-button"
               onClick={() => handleReset(qindex)}
             >
               Reset
             </button>
+            </div>
             <div className="mcq-options-container">
               {mcq.options.map((option, optionIndex) => (
                 <div key={optionIndex} className="option">

@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { FaPlusCircle } from "react-icons/fa";
+import { PiCopy } from "react-icons/pi";
+import { RiDeleteBinLine } from "react-icons/ri";
 import "./ComprehensionQuestion.css";
 import { FaRegImage } from "react-icons/fa6";
+import { useDrag, useDrop, DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import axios from "axios";
 
 const ComprehensionQuestion = ({
@@ -8,19 +13,22 @@ const ComprehensionQuestion = ({
   onDelete,
   handleSave,
   questionData,
+  onAdd,
+  onDuplicate,
 }) => {
   const [paragraph, setParagraph] = useState(questionData.paragraph || "");
   const [questions, setQuestions] = useState(questionData.questions || []);
+  const [rows, setRows] = useState(2); // Initial rows
   const [image, setImage] = useState(questionData.image || "");
 
   const addQuestion = () => {
     setQuestions([
       ...questions,
       {
-        id: questions.length + 1,
         text: "",
         options: ["", "", "", ""],
         correctOption: null,
+        image: "",
       },
     ]);
   };
@@ -43,9 +51,23 @@ const ComprehensionQuestion = ({
     setQuestions(updatedQuestions);
   };
 
-  const deleteQuestion = (index) => {
-    const updatedQuestions = questions.filter((_, i) => i !== index);
-    setQuestions(updatedQuestions);
+  const deleteQuestion = async (index, mcqId) => {
+    const deleteUrl = "http://localhost:5000/api/remove";
+
+    const params = {
+      type: "comprehension",
+      id: questionData._id,
+      mcq_id: mcqId,
+    };
+    try {
+      const response = await axios.post(deleteUrl,{}, {params});
+      console.log(response.data);
+      // setQuestions(response.data);
+      const updatedQuestions = questions.filter((_, i) => i !== index);
+      setQuestions(updatedQuestions);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+    }
   };
 
   const duplicateQuestion = (index) => {
@@ -57,73 +79,58 @@ const ComprehensionQuestion = ({
     setQuestions([...questions, duplicatedQuestion]);
   };
 
-  const handleImageUpload = async (e) => {
+  useEffect(() => {
+    handleSave(
+      questionIndex,
+      {
+        paragraph,
+        questions,
+      },
+      "comprehension"
+    );
+  }, [paragraph, questions, image]);
+
+  const handleFocus = () => {
+    setRows(10); // Expand to show more rows when focused
+  };
+
+  const handleBlur = () => {
+    setRows(2); // Collapse back when focus is lost
+  };
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    console.log('file')
     if (file) {
-      console.log('file name')
-      const formData = new FormData();
-      formData.append("image", file);
-  
-      try {
-        const response = await axios.post("http://localhost:5000/imageupload", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-  
-        const { imageId } = response.data; // MongoDB ID of the image
-        const imageUrl = `http://localhost:5000/api/uploads/${imageId}`;
-        setImage(imageUrl); // Set the image URL for display
-      } catch (error) {
-        console.error("Error uploading the image", error);
-      }
+      setImage(URL.createObjectURL(file)); // Display the image locally
     }
   };
-  useEffect(() => {
-    handleSave(questionIndex, {
-      paragraph,
-      questions, image
-    },"comprehension")
-  }, [paragraph, questions]);
+  const moveQuestion = (fromIndex, toIndex) => {
+    const updatedQuestions = [...questions];
+    const [movedQuestion] = updatedQuestions.splice(fromIndex, 1);
+    updatedQuestions.splice(toIndex, 0, movedQuestion);
+    setQuestions(updatedQuestions);
+  };
+  const DraggableQuestion = ({ question, qIndex }) => {
+    const [, drag] = useDrag({
+      type: "QUESTION",
+      item: { index: qIndex },
+    });
 
-  return (
-    <div className="comprehension-question">
-      <h3>Comprehension Question</h3>
-      <textarea
-        placeholder="Enter the paragraph here..."
-        value={paragraph}
-        onChange={(e) => setParagraph(e.target.value)}
-        rows={5}
-        className="paragraph-input"
-      />
-      <label htmlFor={`q${questionIndex}`} className="image-upload-label">
-                <FaRegImage
-                  style={{
-                    cursor: "pointer",
-                    marginLeft: "10px",
-                    fontSize: "24px",
-                  }}
-                />
-              </label>
-              <input
-                type="file"
-                id={`q${questionIndex}`}
-                style={{ display: "none" }} // Hide the file input
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-
-              {/* Display the uploaded image */}
-              {image && (
-                <img
-                  src={image}
-                  alt="Uploaded"
-                  style={{ marginTop: "10px", maxWidth: "200px" }}
-                />
-              )}
-
-      <h4>Questions</h4>
-      {questions.map((question, qIndex) => (
-        <div key={question._id} className="question-block">
+    const [, drop] = useDrop({
+      accept: "QUESTION",
+      hover: (draggedItem) => {
+        if (draggedItem.index !== qIndex) {
+          moveQuestion(draggedItem.index, qIndex);
+          draggedItem.index = qIndex;
+        }
+      },
+    });
+    return (
+      <div className="mcq-questions-container">
+        <div
+          ref={(node) => drag(drop(node))}
+          key={`${questionIndex}-${question._id}-${qIndex}`}
+          className="question-block"
+        >
           <div className="question-header">
             <input
               type="text"
@@ -132,28 +139,17 @@ const ComprehensionQuestion = ({
               onChange={(e) => updateQuestionText(qIndex, e.target.value)}
               className="question-input"
             />
-            <div className="question-actions">
-              <button
-                className="duplicate-question"
-                onClick={() => duplicateQuestion(qIndex)}
-              >
-                Duplicate
-              </button>
-              <button
-                className="delete-question"
-                onClick={() => deleteQuestion(qIndex)}
-              >
-                Delete
-              </button>
-            </div>
           </div>
 
           <div className="options-block">
             {question.options.map((option, oIndex) => (
-              <div key={`${question._id}-${qIndex}-${oIndex}`} className="option-row">
+              <div
+                key={`${question._id}-${qIndex}-${oIndex}`}
+                className="option-row"
+              >
                 <input
                   type="radio"
-                  name={`correctOption-${question._id}-${oIndex}`}
+                  name={`correctOption-${questionIndex}-${qIndex}-${oIndex}`}
                   checked={question.correctOption === oIndex}
                   onChange={() => updateCorrectOption(qIndex, oIndex)}
                 />
@@ -175,14 +171,106 @@ const ComprehensionQuestion = ({
             </p>
           )}
         </div>
-      ))}
+        <div className="action-buttons">
+          <button className="add-question" onClick={() => addQuestion()}>
+            <FaPlusCircle />
+          </button>
+          <button
+            className="duplicate-question"
+            onClick={() => duplicateQuestion(qIndex)}
+          >
+            <PiCopy />
+          </button>
+          <button
+            className="delete-question"
+            onClick={() => deleteQuestion(qIndex, question._id)}
+          >
+            <RiDeleteBinLine />
+          </button>
+        </div>
+      </div>
+    );
+  };
+  return (
+    <div className="comprehension-question-container">
+      <div className="comprehension-question">
+        <h3>Comprehension Question</h3>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <textarea
+            placeholder="Enter the paragraph here..."
+            value={paragraph}
+            onChange={(e) => setParagraph(e.target.value)}
+            rows={rows}
+            className="paragraph-input"
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+          />
+          <label
+            htmlFor={`${questionIndex}-comprehension-image-upload`}
+            className="image-upload-label"
+          >
+            <FaRegImage
+              style={{
+                cursor: "pointer",
+                marginLeft: "10px",
+                fontSize: "24px",
+              }}
+            />
+          </label>
+          <input
+            type="file"
+            id={`${questionIndex}-comprehension-image-upload`}
+            style={{ display: "none" }} // Hide the file input
+            accept="image/*"
+            onChange={handleImageUpload}
+          />
+        </div>
 
-      <button className="add-question" onClick={addQuestion}>
-        Add Question
-      </button>
-      <button className="delete-question" onClick={onDelete}>
-        Delete Question
-      </button>
+        {image && (
+          <div style={{ marginTop: "10px" }}>
+            <img
+              src={image}
+              alt="Uploaded"
+              style={{ maxWidth: "200px", display: "block" }}
+            />
+          </div>
+        )}
+
+        <h4>Questions</h4>
+        <DndProvider backend={HTML5Backend}>
+          {questions.map((question, qIndex) => (
+            <DraggableQuestion
+              key={`${questionData._id}-${qIndex}`}
+              question={question}
+              qIndex={qIndex}
+            />
+          ))}
+        </DndProvider>
+      </div>
+      <div className="action-buttons">
+        <button className="add-question" onClick={() => onAdd("cloze")}>
+          <FaPlusCircle />
+        </button>
+        <button
+          className="duplicate-question"
+          onClick={() => {
+            let newData = {
+              paragraph,
+              questions,
+              image,
+            };
+            onDuplicate("cloze", newData, questionIndex + 1);
+          }}
+        >
+          <PiCopy />
+        </button>
+        <button
+          className="delete-question"
+          onClick={() => onDelete("comprehension", questionIndex, questionData._id)}
+        >
+          <RiDeleteBinLine />
+        </button>
+      </div>
     </div>
   );
 };

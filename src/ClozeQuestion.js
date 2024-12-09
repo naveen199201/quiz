@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Editor, EditorState, RichUtils, convertToRaw, ContentState } from "draft-js";
+import {
+  Editor,
+  EditorState,
+  RichUtils,
+  convertToRaw,
+  ContentState,
+} from "draft-js";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { IoMdAddCircle } from "react-icons/io";
-import { HiOutlineDuplicate } from "react-icons/hi";
+import { FaPlusCircle } from "react-icons/fa";
+import { PiCopy } from "react-icons/pi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FaRegImage } from "react-icons/fa6";
-import axios from "axios";
-
 
 import "draft-js/dist/Draft.css";
 import "./ClozeQuestion.css";
@@ -45,12 +49,14 @@ const DraggableOption = ({ word, index, moveOption, deleteOption }) => {
   });
 
   return (
-    <div ref={(node) => drag(drop(node))} className="option">
-      {word}
+    <>
+      <div ref={(node) => drag(drop(node))} className="option">
+        {word}
+      </div>
       <button className="delete-option" onClick={() => deleteOption(index)}>
         x
       </button>
-    </div>
+    </>
   );
 };
 
@@ -59,55 +65,53 @@ const ClozeQuestion = ({
   onDelete,
   handleSave,
   questionData,
+  onAdd,
+  onDuplicate,
 }) => {
-  const [editorState, setEditorState] = useState(() => {
-    
-    // Check if questionData.answerText exists, and initialize accordingly
-    const contentState = questionData?.answerText
-      ? ContentState.createFromText(questionData.answerText) // If there's answerText, initialize with it
-      : ContentState.createFromText(""); // If no answerText, initialize with empty text
-    return EditorState.createWithContent(contentState);
-  });
-  const [image, setImage] = useState(questionData.image || "");
+  // const [editorState, setEditorState] = useState(() => {
+  //   // Check if questionData.answerText exists, and initialize accordingly
+  //   const contentState = questionData?.answerText
+  //     ? ContentState.createFromText(questionData.answerText) // If there's answerText, initialize with it
+  //     : ContentState.createFromText(""); // If no answerText, initialize with empty text
+  //   return EditorState.createWithContent(contentState);
+  // });
+  console.log(questionData.rawText);
+  const contentState = questionData?.rawText && Array.isArray(questionData.rawText)
+  ? ContentState.createFromBlockArray(questionData.rawText)
+  : ContentState.createFromText("");
+  console.log(contentState);
+  EditorState.createWithContent(contentState);
+  // editorState.createWithContent(contentState);
+  // const contentState = questionData?.rawText
+  //   ? ContentState.createFromBlockArray(questionData.rawText[0])
+  //   : ContentState.createFromText("");
+  const [editorState, setEditorState] = useState(
+    EditorState.createWithContent(contentState)
+  );
+
   const [underlinedWords, setUnderlinedWords] = useState(
     questionData.underlinedWords || []
   );
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    console.log('file')
-    if (file) {
-      console.log('file name')
-      const formData = new FormData();
-      formData.append("image", file);
-  
-      try {
-        const response = await axios.post("http://localhost:5000/imageupload", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-  
-        const { imageId } = response.data; // MongoDB ID of the image
-        const imageUrl = `http://localhost:5000/api/uploads/${imageId}`;
-        setImage(imageUrl); // Set the image URL for display
-      } catch (error) {
-        console.error("Error uploading the image", error);
-      }
-    }
-  };
   const [questionText, setQuestionText] = useState(
     questionData.questionText || ""
   );
   const [answerText, setAnswerText] = useState(questionData.answerText || "");
+  const [image, setImage] = useState(questionData.image || "");
+  const [rawText, setRawText] = useState(questionData.rawText || []);
 
   useEffect(() => {
-    // Initialize local state when props change
-    
-    handleSave(questionIndex, {
-      questionText,
-      underlinedWords,
-      answerText,
-      image,
-    },"cloze")
-  }, [underlinedWords, answerText]);
+    handleSave(
+      questionIndex,
+      {
+        questionText,
+        underlinedWords,
+        answerText,
+        image,
+        rawText,
+      },
+      "cloze"
+    );
+  }, [underlinedWords, answerText, questionText, image, rawText]);
 
   // Function to apply underline
   const toggleUnderline = () => {
@@ -160,15 +164,32 @@ const ClozeQuestion = ({
     setUnderlinedWords(Array.from(new Set(newUnderlinedWords)));
     setQuestionText(updatedPreviewText);
     setAnswerText(contentState.getPlainText());
+    setRawText(rawContent.blocks);
   };
 
   // Update editor state and preview text dynamically
+  // const handleEditorChange = (newEditorState) => {
+  //   setEditorState(newEditorState);
+  //   const contentState = newEditorState.getCurrentContent();
+  //   const plainText = contentState.getPlainText();
+  //   setQuestionText(plainText); // Update preview text with plain text
+  //   extractUnderlinedWords(newEditorState); // Update underlined words
+  // };
+
   const handleEditorChange = (newEditorState) => {
     setEditorState(newEditorState);
+
+    // Extract the raw content from the editor state
     const contentState = newEditorState.getCurrentContent();
     const plainText = contentState.getPlainText();
-    setQuestionText(plainText); // Update preview text with plain text
-    extractUnderlinedWords(newEditorState); // Update underlined words
+    const rawContent = convertToRaw(contentState); // Get raw content
+    console.log(rawContent);
+
+    // Now, you can save raw content
+    setQuestionText(plainText); // Save raw content (or you can store it wherever necessary)
+    setRawText(rawContent.blocks);
+    // If you want to keep track of underlined words or any other info:
+    extractUnderlinedWords(newEditorState); // Update underlined words if necessary
   };
 
   // Move option (drag and drop)
@@ -184,54 +205,65 @@ const ClozeQuestion = ({
     const updatedWords = underlinedWords.filter((_, i) => i !== index);
     setUnderlinedWords(updatedWords);
   };
-
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(URL.createObjectURL(file)); // Display the image locally
+    }
+  };
   return (
     <div className="cloze-question-container">
       <div className="cloze-question">
         <h3>Cloze Question</h3>
-
         {/* Question Input Box */}
 
-
-        <div className="question-section">
+        <div className="cloze-question-section">
           <h4>Question</h4>
-          <div className="input-group">
-            <label htmlFor="Preview" className="input-label">
-              Preview <span className="required-star">*</span>
-            </label>
-            <input
-              type="text"
-              value={questionText}
-              readOnly
-              className="preview-textbox"
-              placeholder="Preview"
-            />
-          </div>
-          <label htmlFor={`q${questionIndex}`} className="image-upload-label">
-                <FaRegImage
-                  style={{
-                    cursor: "pointer",
-                    marginLeft: "10px",
-                    fontSize: "24px",
-                  }}
-                />
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <div className="input-group">
+              <label htmlFor="Preview" className="input-label">
+                Preview <span className="required-star">*</span>
               </label>
               <input
-                type="file"
-                id={`q${questionIndex}`}
-                style={{ display: "none" }} // Hide the file input
-                accept="image/*"
-                onChange={handleImageUpload}
+                type="text"
+                value={questionText}
+                readOnly
+                className="preview-textbox"
+                placeholder="Preview"
               />
+            </div>
+            {/* Image Upload Icon */}
 
-              {/* Display the uploaded image */}
-              {image && (
-                <img
-                  src={image}
-                  alt="Uploaded"
-                  style={{ marginTop: "10px", maxWidth: "200px" }}
-                />
-              )}
+            <label
+              htmlFor={`${questionIndex}-cloze-image-upload`}
+              className="image-upload-label"
+            >
+              <FaRegImage
+                style={{
+                  cursor: "pointer",
+                  marginLeft: "10px",
+                  fontSize: "24px",
+                }}
+              />
+            </label>
+            <input
+              type="file"
+              id={`${questionIndex}-cloze-image-upload`}
+              style={{ display: "none" }} // Hide the file input
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
+          </div>
+
+          {image && (
+            <div style={{ marginTop: "10px" }}>
+              <img
+                src={image}
+                alt="Uploaded"
+                style={{ maxWidth: "200px", display: "block" }}
+              />
+            </div>
+          )}
           <div className="input-group">
             <label htmlFor="Sentence" className="input-label">
               Sentence <span className="required-star">*</span>
@@ -250,13 +282,15 @@ const ClozeQuestion = ({
               <h4>Options</h4>
               {underlinedWords.length > 0 ? (
                 underlinedWords.map((word, index) => (
-                  <DraggableOption
-                    key={index}
-                    word={word}
-                    index={index}
-                    moveOption={moveOption}
-                    deleteOption={deleteOption}
-                  />
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <DraggableOption
+                      key={`${questionData._id}-${questionIndex}-${index}`}
+                      word={word}
+                      index={index}
+                      moveOption={moveOption}
+                      deleteOption={deleteOption}
+                    />
+                  </div>
                 ))
               ) : (
                 <p>No options yet. Underline text to create options.</p>
@@ -266,13 +300,28 @@ const ClozeQuestion = ({
         </div>
       </div>
       <div className="action-buttons">
-        <button className="add-question" onClick={onDelete}>
-          <IoMdAddCircle />
+        <button className="add-question" onClick={() => onAdd("cloze")}>
+          <FaPlusCircle />
         </button>
-        <button className="duplicate-question" onClick={onDelete}>
-          <HiOutlineDuplicate />
+        <button
+          className="duplicate-question"
+          onClick={() => {
+            let newData = {
+              questionText,
+              underlinedWords,
+              answerText,
+              image,
+              rawText,
+            };
+            onDuplicate("cloze", newData, questionIndex + 1);
+          }}
+        >
+          <PiCopy />
         </button>
-        <button className="delete-question" onClick={onDelete}>
+        <button
+          className="delete-question"
+          onClick={() => onDelete("cloze", questionIndex, questionData._id)}
+        >
           <RiDeleteBinLine />
         </button>
       </div>

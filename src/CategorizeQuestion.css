@@ -101,3 +101,16 @@ p {
 .add-item select {
   margin-left: 158px;
 }
+
+.categorize-questions-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: space-around;
+}
+
+.categories-section img {
+  display: block;
+  margin-top: 10px;
+  max-width: 100%;
+}

@@ -44,7 +44,13 @@ const Option = ({ word, isUsed }) => {
 };
 
 // **ClozeStudentQuestion Component**
-const ClozeStudentQuestion = ({ question,reviewedQuestions,toggleReview, onAnswerChange }) => {
+const ClozeStudentQuestion = ({
+  question,
+  reviewedQuestions,
+  toggleReview,
+  onAnswerChange,
+  onReset,
+}) => {
   const { questionText, underlinedWords } = question;
 
   // Split the question text to create blanks
@@ -70,18 +76,22 @@ const ClozeStudentQuestion = ({ question,reviewedQuestions,toggleReview, onAnswe
   const handleRefresh = () => {
     setAnswers(Array(textParts.length - 1).fill(null));
     onAnswerChange(Array(textParts.length - 1).fill(null)); // Notify parent of reset
+    onReset();
   };
 
   return (
     <div className="cloze-student-question">
-     
-     <button onClick={() => toggleReview(question._id)}>
-          {reviewedQuestions.includes(question._id) ? "Unmark" : "Mark for Review"}
-      </button>
-      <div className="refresh-container">
-        <button className="refresh-button" onClick={handleRefresh}>
-          Refresh
+      <div style={{ display: "flex", justifyContent: "flex-end", gap:'20px' }}>
+        <button onClick={() => toggleReview(question._id)}>
+          {reviewedQuestions.includes(question._id)
+            ? "Unmark"
+            : "Mark for Review"}
         </button>
+        <div className="refresh-container">
+          <button className="refresh-button" onClick={handleRefresh}>
+            Reset
+          </button>
+        </div>
       </div>
       <div className="options-container">
         {underlinedWords.map((word, index) => (
@@ -105,7 +115,6 @@ const ClozeStudentQuestion = ({ question,reviewedQuestions,toggleReview, onAnswe
       </div>
 
       {/* Render Options */}
-      
     </div>
   );
 };

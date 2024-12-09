@@ -33,33 +33,11 @@ const DraggableItem = ({ item, isItemDropped }) => {
     </div>
   );
 };
-const generateRandomColor = () => {
-  const letters = "0123456789ABCDEF";
-  let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-};
 
-const getFontColorBasedOnBackground = (bgColor) => {
-  // Convert the hex color to RGB
-  const r = parseInt(bgColor.slice(1, 3), 16);
-  const g = parseInt(bgColor.slice(3, 5), 16);
-  const b = parseInt(bgColor.slice(5, 7), 16);
 
-  // Calculate luminance
-  const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-
-  // Return black or white font color based on luminance
-  return luminance > 128 ? "#000" : "#fff";
-};
-
-// Example usage
-console.log(generateRandomColor());
 
 // Category Component (Droppable)
-const CategoryArea = ({ category, onDropItem, items }) => {
+const CategoryArea = ({ category, onDropItem, items, color }) => {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "ITEM",
     drop: (item) => onDropItem(category, item),
@@ -67,13 +45,11 @@ const CategoryArea = ({ category, onDropItem, items }) => {
       isOver: !!monitor.isOver(),
     }),
   }));
-  const bgColor = generateRandomColor();
-  const fontColor = getFontColorBasedOnBackground(bgColor);
   return (
     <div>
       <div
         className="category-name"
-        style={{ backgroundColor: bgColor, fontColor }}
+        style={{ backgroundColor: color, color: '#fff' }}
       >
         {category}
       </div>
@@ -83,12 +59,12 @@ const CategoryArea = ({ category, onDropItem, items }) => {
           padding: "20px",
           margin: "10px",
           borderRadius: "10px",
-          backgroundColor: bgColor,
+          backgroundColor: color,
           minHeight: "100px",
           width: "150px",
           textAlign: "center",
           fontSize: "16px",
-          fontColor,
+          color: '#fff',
         }}
       >
         {/* Display the items dropped into this category */}
@@ -112,7 +88,7 @@ const CategoryArea = ({ category, onDropItem, items }) => {
 };
 
 // Main CategorizeStudentQuestion Component
-const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, onAnswerChange }) => {
+const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, onAnswerChange, onReset }) => {
   // Initialize the state with empty categories
   const [answers, setAnswers] = useState(() => {
     const initialAnswers = {};
@@ -122,6 +98,7 @@ const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, on
     return initialAnswers;
   });
 
+  const [colors, setColors] = useState(['#d7e8b1','#f5c4c4'])
   // State to keep track of which items are dropped
   const [droppedItems, setDroppedItems] = useState([]);
 
@@ -148,14 +125,16 @@ const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, on
       return resetAnswers;
     });
     setDroppedItems([]); // Clear the dropped items
+    onReset();
   };
 
   return (
-    <div style={{ marginBottom: "20px" }}>
+    <div style={{marginBottom: "20px" }}>
+      <div style={{ display:'flex', justifyContent:'flex-end', gap:'20px'}}>
       <button onClick={() => toggleReview(question._id)}>
           {reviewedQuestions.includes(question._id) ? "Unmark" : "Mark for Review"}
       </button>
-      {/* Refresh Button */}
+      {/* Reset Button */}
       <button
         onClick={refreshQuestion}
         style={{
@@ -169,9 +148,11 @@ const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, on
           textAlign: "right"
         }}
       >
-        Refresh
+        Reset
       </button>
+      </div>
       <h3>{question.questionText}</h3>
+
       <div
         style={{
           margin: "20px 0px",
@@ -194,6 +175,7 @@ const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, on
         {question.categories.map((category, index) => (
           <CategoryArea
             key={index}
+            color={colors[index]}
             category={category}
             items={answers[category]} // Display the answers dropped into this category
             onDropItem={handleDropItem}

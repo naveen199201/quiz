@@ -1,9 +1,10 @@
 .comprehension-question {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  background-color: #f9f9f9;
+  padding: 30px;
+  margin: 10px 20px;
+  background-color: #fff; /* Adds a background color */
+  border-radius: 8px; /* Optional: Rounded corners */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Even shadow on all sides */
+  width: calc(100% - 160px);
 }
 
 .paragraph-input {
@@ -16,11 +17,12 @@
 }
 
 .question-block {
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 0.5rem;
-  background-color: #fff;
+  padding: 30px;
+  margin-bottom: 20px;
+  background-color: #fff; /* Adds a background color */
+  border-radius: 8px; /* Optional: Rounded corners */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .question-header {
@@ -31,7 +33,7 @@
 }
 
 .question-input {
-  width: 75%;
+  /* width: 75%; */
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -48,17 +50,13 @@
   cursor: pointer;
 }
 
-.delete-question {
-  background-color: #ff4d4d;
-}
-
 .options-block {
   margin-top: 0.5rem;
 }
 .option-row {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
+  /* margin-bottom: 0.5rem; */
 }
 
 .option-row input[type="radio"] {
@@ -66,6 +64,10 @@
   margin-right: 0.5rem;
   width: 1rem; /* Ensure small fixed width for the radio button */
   height: 1rem; /* Adjust height if needed */
+}
+.option-row input[type="text"] {
+  border: none; /* Adjust height if needed */
+  padding: 5px;
 }
 
 .option-input {
@@ -76,17 +78,19 @@
   font-size: 1rem;
 }
 
-.add-question {
-  background-color: #4caf50;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
 .answer-display {
   font-weight: bold;
   margin-top: 0.5rem;
+}
+.comprehension-question-container,
+.mcq-questions-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: space-between;
+}
+.comprehension-question img {
+  display: block;
+  margin-top: 10px;
+  max-width: 100%;
 }

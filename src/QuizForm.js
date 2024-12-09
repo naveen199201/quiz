@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CategorizeStudentQuestion from "./CategorizeStudentQuestion";
 import ClozeStudentQuestionWrapper from "./ClozeStudentQuestion";
 import ComprehensionStudentQuestion from "./ComprehensionStudentQuestion";
@@ -10,13 +10,29 @@ import "./QuizForm.css";
 const QuizForm = ({ questions }) => {
   const [answers, setAnswers] = useState({});
   const [reviewedQuestions, setReviewedQuestions] = useState([]);
+  const [questionsCount, setQuestionsCount] =useState(0)
+  const [compQuestionsCount, setComprehensionQuestions] = useState(0)
   const baseUrl = "http://localhost:5000/api/submissions";
+  const [answeredQuestionsCount, setAnsweredQuestionsCount] = useState(0);
+
   const handleAnswerChange = (question, answer) => {
     setAnswers((prev) => ({
       ...prev,
       [question]: answer,
     }));
   };
+
+  const  onResetAnswers=(question_id, mcq_id = '') =>{
+    console.log(answers, question_id, mcq_id)
+    // (questions_id, question._id)
+    const newData = { ...answers }
+    if(mcq_id !== ''){
+      delete newData.question_id.mcq_id
+    }else{
+      delete newData[question_id]
+    }
+    setAnswers(newData);
+  }
   const toggleReview = (questionId) => {
     setReviewedQuestions((prev) =>
       prev.includes(questionId)
@@ -49,34 +65,51 @@ const QuizForm = ({ questions }) => {
     axios.post(baseUrl, { data: answers });
     alert("Your answers have been submitted!");
   };
-  let compQuestions = 0;
-  questions.comprehensionQuestions.forEach((element) => {
-    compQuestions += element.questions.length;
-  });
-  const noOfQuestions =
-    questions.categorizeQuestions.length +
-    questions.clozeQuestions.length +
-    compQuestions;
-  const answeredQuestions = getNoOfAnswers();
-  console.log(noOfQuestions, answeredQuestions);
+  useEffect(() => {
+    let compQuestions = 0;
+    let noOfQuestions = 0;
+
+    questions.comprehensionQuestions.forEach((element) => {
+      compQuestions += element.questions.length;
+    });
+    noOfQuestions =
+      questions.categorizeQuestions.length +
+      questions.clozeQuestions.length +
+      compQuestions;
+      console.log(noOfQuestions)
+      setQuestionsCount(noOfQuestions)
+  },[questions])
+
+  useEffect(()=>{
+    setAnsweredQuestionsCount(getNoOfAnswers);
+  },[answers])
+
+  console.log(questionsCount, answeredQuestionsCount);
   console.log(answers);
   console.log(reviewedQuestions);
   return (
+    <div style={{ display:'flex', justifyContent:'space-around', gap: '20px'}}>
+
     <div className="student-quiz">
       <h1>Quiz</h1>
-      <progress value={answeredQuestions} max={noOfQuestions} />
+      <progress value={answeredQuestionsCount} max={questionsCount} />
+
+
       <form onSubmit={(e) => e.preventDefault()}>
         {/* Categorize Questions */}
         <div>
           {questions.categorizeQuestions.map((question, index) => (
             <div key={index} className="question-section">
-              <h3>Question {index + 1}</h3>
+              <h3>Categorize Question {index + 1}</h3>
               <CategorizeStudentQuestion
                 question={question}
                 reviewedQuestions={reviewedQuestions}
                 toggleReview={toggleReview}
                 answer={answers[question._id] || {}}
                 onAnswerChange={handleAnswerChange}
+                onReset={() =>
+                  onResetAnswers(question._id)
+                }
               />
             </div>
           ))}
@@ -86,7 +119,7 @@ const QuizForm = ({ questions }) => {
         <div>
           {questions.clozeQuestions.map((question, index) => (
             <div key={index} className="question-section">
-              <h3>Question {index + 1}</h3>
+              <h3>Cloze Question {index + 1}</h3>
               <DndProvider backend={HTML5Backend}>
                 <ClozeStudentQuestionWrapper
                   question={question}
@@ -95,6 +128,9 @@ const QuizForm = ({ questions }) => {
                   answer={answers[question._id] || ""}
                   onAnswerChange={(answer) =>
                     handleAnswerChange(question._id, answer)
+                  }
+                  onReset={() =>
+                    onResetAnswers(question._id)
                   }
                 />
               </DndProvider>
@@ -106,7 +142,7 @@ const QuizForm = ({ questions }) => {
         <div>
           {questions.comprehensionQuestions.map((question, index) => (
             <div key={index} className="question-section">
-              <h3>Question {index + 1}</h3>
+              <h3>Comprehension {index + 1}</h3>
               <ComprehensionStudentQuestion
                 question={question}
                 reviewedQuestions={reviewedQuestions}
@@ -114,6 +150,9 @@ const QuizForm = ({ questions }) => {
                 answer={answers[question._id] || {}}
                 onAnswerChange={(answer) =>
                   handleAnswerChange(question._id, answer)
+                }
+                onReset={() =>
+                  onResetAnswers(questions_id, question._id)
                 }
               />
             </div>
@@ -125,6 +164,12 @@ const QuizForm = ({ questions }) => {
           Submit Quiz
         </button>
       </form>
+      </div>
+      <div className="summary-text">
+          <p><b>Answered Questions:</b> {answeredQuestionsCount}</p>
+          <p><b>Un Answered Questions:</b> {questionsCount-answeredQuestionsCount}</p>
+          <p><b>Mark For Review Questions:</b> {reviewedQuestions.length}</p>
+      </div>
     </div>
   );
 };
