@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { v4 as uuidv4 } from "uuid";
 import { FaRegImage } from "react-icons/fa6";
 import { FaPlusCircle } from "react-icons/fa";
 import { PiCopy } from "react-icons/pi";
@@ -54,7 +53,7 @@ const CategorizeQuestion = ({
     );
     setCategories(updatedCategories);
     const updatedItems = items.filter((item) => item.category !== categoryName);
-    setitems(updatedItems); // Also remove items belonging to deleted category
+    setitems(updatedItems); 
   };
 
   const handleDeleteItem = (itemId) => {

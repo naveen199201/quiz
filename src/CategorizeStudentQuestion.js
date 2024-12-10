@@ -101,7 +101,6 @@ const CategorizeStudentQuestion = ({
     });
     return initialAnswers;
   });
-  const [img, setImg] = useState("");
   const [colors, setColors] = useState(["#d7e8b1", "#f5c4c4"]);
   const [droppedItems, setDroppedItems] = useState([]);
 

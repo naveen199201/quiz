@@ -141,7 +141,6 @@ const ClozeQuestion = ({
     <div className="cloze-question-container">
       <div className="cloze-question">
         <h3>Cloze Question</h3>
-
         <div className="cloze-question-section">
           <h4>Question</h4>
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>

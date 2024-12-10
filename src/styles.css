@@ -36,7 +36,6 @@
 .categorize-question input,
 .cloze-question textarea,
 .comprehension-question input {
-  /* width: calc(100% - 20px); */
   margin: 5px 0;
   padding: 10px;
   font-size: 14px;

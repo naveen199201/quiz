@@ -5,11 +5,10 @@ import { FaBookmark } from "react-icons/fa";
 import { TfiReload } from "react-icons/tfi";
 
 const ComprehensionStudentQuestion = ({ question, answer, reviewedQuestions, toggleReview, onAnswerChange, onReset }) => {
-  // Function to reset the answer for a specific question
   const handleReset = (index) => {
     const updatedAnswer = { ...answer };
-    delete updatedAnswer[index]; // Remove the selected answer for the question
-    onAnswerChange(updatedAnswer); // Notify parent about the updated answer
+    delete updatedAnswer[index];
+    onAnswerChange(updatedAnswer);
     onReset(index);
   };
 
@@ -17,23 +16,20 @@ const ComprehensionStudentQuestion = ({ question, answer, reviewedQuestions, tog
     const updatedAnswer = { ...answer, [qindex]: selectedOption };
     const updatedQuestion = {
       ...question,
-      selectedAnswer: selectedOption, // Include the selected answer
+      selectedAnswer: selectedOption,
     };
-    onAnswerChange(updatedAnswer, updatedQuestion._id); // Notify parent with both selected and correct answer
+    onAnswerChange(updatedAnswer, updatedQuestion._id);
   };
   return (
     <>
       <p className="paragraph">{question.paragraph}</p>
-
       <div className="comprehension-quiz-question">
         {question.questions.map((mcq, qindex) => (
           <div key={qindex} className="mcq">
-            {/* Reset Button for the Question */}
             <p className="mcq-question">
               {qindex + 1}. {mcq.text}
             </p>
             <div className="quiz-action-buttons">
-
               <button className="review-button" onClick={() => toggleReview(question._id)}>
                 {reviewedQuestions.includes(question._id) ? <FaBookmark />
                   : <CiBookmark />

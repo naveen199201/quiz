@@ -4,9 +4,9 @@
 .question-section {
     padding: 50px;
     margin-bottom: 20px;
-    background-color: #fff; /* Adds a background color */
-    border-radius: 8px; /* Optional: Rounded corners */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); /* Even shadow on all sides */
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
   }
 progress{
     width: 100%;
@@ -15,8 +15,8 @@ progress{
     padding: 30px;
   margin: 10px;
   margin-bottom: 20px;
-  background-color: #fff; /* Adds a background color */
-  border-radius: 8px; /* Optional: Rounded corners */
+  background-color: #fff; 
+  border-radius: 8px; 
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 30%;
     display: flex;

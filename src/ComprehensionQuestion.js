@@ -7,6 +7,8 @@ import { FaRegImage } from "react-icons/fa6";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ComprehensionQuestion = ({
   questionIndex,
@@ -18,7 +20,7 @@ const ComprehensionQuestion = ({
 }) => {
   const [paragraph, setParagraph] = useState(questionData.paragraph || "");
   const [questions, setQuestions] = useState(questionData.questions || []);
-  const [rows, setRows] = useState(2); // Initialize rows
+  const [rows, setRows] = useState(2); 
   const [image, setImage] = useState(questionData.image || "");
 
   const addQuestion = () => {
@@ -60,10 +62,13 @@ const ComprehensionQuestion = ({
     };
     try {
       const response = await axios.post(deleteUrl,{}, {params});
+      if (response.status === 200) {
+        toast.success(response.data.message);
+      }
       const updatedQuestions = questions.filter((_, i) => i !== index);
       setQuestions(updatedQuestions);
     } catch (error) {
-      console.error("Error fetching questions:", error);
+      console.error("Error deleting questions:", error);
     }
   };
 
@@ -269,6 +274,18 @@ const ComprehensionQuestion = ({
           <RiDeleteBinLine />
         </button>
       </div>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   );
 };

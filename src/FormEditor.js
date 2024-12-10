@@ -22,7 +22,6 @@ const FormEditor = () => {
       try {
         const response = await axios.get(baseUrl, { params });
         console.log(response.data);
-        // setQuestions(response.data);
         setClozeQuestions(response?.data.clozeQuestions);
         setCategorizeQuestions(response.data?.categorizeQuestions);
         setComprehensionQuestions(response.data?.comprehensionQuestions);
@@ -155,9 +154,6 @@ const FormEditor = () => {
           data,
           ...comprehensionQuestions.slice(1),
         ];
-        // const updatedQuestions = comprehensionQuestions.splice(index, 0, data);
-
-        // const updatedQuestions = [...comprehensionQuestions, data];
         setComprehensionQuestions(updatedQuestions);
         break;
       }
@@ -212,7 +208,6 @@ const FormEditor = () => {
 
   return (
     <div className="form-editor">
-      {/* <FormHeader /> */}
       <QuestionTypeSelector onAddQuestion={addQuestion} />
       <DndProvider backend={HTML5Backend}>
         {categorizeQuestions.map((question, index) => {
@@ -231,13 +226,8 @@ const FormEditor = () => {
         })}
         {clozeQuestions.map((question, index) => {
           return (
-            // <div
-            //   key={`cloze-${question._id}`}
-            //   className="cloze-question-container"
-            // >
             <ClozeQuestion
               key={index}
-              // key={`cloze-${question._id}`}
               questionIndex={index}
               questionData={question}
               handleSave={handleSaveQuestion}
@@ -251,7 +241,6 @@ const FormEditor = () => {
           return (
             <ComprehensionQuestion
               key={index}
-              // key={`comprehension-${question._id}`}
               questionIndex={index}
               questionData={question}
               handleSave={handleSaveQuestion}
@@ -262,7 +251,6 @@ const FormEditor = () => {
           );
         })}
       </DndProvider>
-      {/* <FormPreview questions={questions} /> */}
       {(clozeQuestions.length>0 ||
         categorizeQuestions.length>0  ||
         comprehensionQuestions.length>0 ) && (

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import QuizForm from "./QuizForm";
 import './formheader.css';
 
 const FormHeader = () => {
@@ -11,47 +10,6 @@ const FormHeader = () => {
     if (file) {
       setHeaderImage(URL.createObjectURL(file));
     }
-  };
-  const questions = {
-    clozeQuestions: [
-      {
-        questionText: "What is the color of the sky?",
-        underlinedWords: ["blue", "sky"],
-        answerText: "The sky is blue.",
-      },
-      {
-        questionText: "What is 2 + 2?",
-        underlinedWords: ["2", "2"],
-        answerText: "4",
-      },
-    ],
-    categorizeQuestions: [
-      {
-        questionText: "Categorize the items.",
-        categories: ["Fruits", "Animals"],
-        items: [
-          { category: "Fruits", answer: "Apple" },
-          { category: "Animals", answer: "Dog" },
-        ],
-      },
-    ],
-    comprehensionQuestions: [
-      {
-        paragraph: "The fox jumped over the fence.",
-        questions: [
-          {
-            text: "What did the fox jump over?",
-            options: ["Wall", "Fence", "Tree"],
-            correctOption: 1,
-          },
-          {
-            text: "What animal is mentioned?",
-            options: ["Fox", "Dog", "Cat"],
-            correctOption: 0,
-          },
-        ],
-      },
-    ],
   };
 
   return (

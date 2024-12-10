@@ -5,7 +5,6 @@ import axios from "axios";
 import "./QuizApp.css"
 
 const QuizApp = () => {
-  // const baseUrl = "http://localhost:5000/api/questions";
   const baseUrl = "https://backend-eight-virid-92.vercel.app/api/questions";
   const [questions, setQuestions] = useState({});
   const [activeTab, setActiveTab] = useState("formEditor");
@@ -23,11 +22,7 @@ const QuizApp = () => {
     };
 
     fetchQuestions();
-  }, [activeTab]); // Empty dependency array ensures this runs once when the component mounts.
-
-  const handleQuestionsUpdate = (updatedQuestions) => {
-    setQuestions(updatedQuestions);
-  };
+  }, [activeTab]); 
 
   return (
     <div className="tabbed-quiz-app">
@@ -50,10 +45,7 @@ const QuizApp = () => {
       {/* Tab Content */}
       <div className="tab-content">
         {activeTab === "formEditor" && (
-          <FormEditor
-          // questions={questions}
-          // onQuestionsChange={handleQuestionsUpdate}
-          />
+          <FormEditor />
         )}
         {activeTab === "quiz" && <QuizForm questions={questions} />}
       </div>

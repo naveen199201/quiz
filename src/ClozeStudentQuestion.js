@@ -57,7 +57,6 @@ const ClozeStudentQuestion = ({
   // Split the question text to create blanks
   const textParts = questionText.split("____");
 
-  // State for answers in blanks
   const [answers, setAnswers] = useState(
     Array(textParts.length - 1).fill(null)
   );
@@ -70,10 +69,8 @@ const ClozeStudentQuestion = ({
     onAnswerChange(updatedAnswers);
   };
 
-  // Determine if an option is used
   const isOptionUsed = (word) => answers.includes(word);
 
-  // Refresh the question
   const handleRefresh = () => {
     console.log('refresh');
     setAnswers(Array(textParts.length - 1).fill(null));
@@ -84,7 +81,6 @@ const ClozeStudentQuestion = ({
   return (
     <div className="cloze-student-question">
       <div className="quiz-action-buttons">
-
         <button className="review-button" onClick={() => toggleReview(question._id)}>
           {reviewedQuestions.includes(question._id) ? <FaBookmark />
             : <CiBookmark />
