@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { CiBookmark } from "react-icons/ci";
 import { FaBookmark } from "react-icons/fa";
 import { TfiReload } from "react-icons/tfi";
 import "./CategorizeStudentQuestion.css";
+import axios from "axios";
 
 // Item Component (Draggable)
 const DraggableItem = ({ item, isItemDropped }) => {
@@ -49,7 +50,7 @@ const CategoryArea = ({ category, onDropItem, items, color }) => {
     <div>
       <div
         className="category-name"
-        style={{ backgroundColor: color, color: '#fff' }}
+        style={{ backgroundColor: color, color: "#fff" }}
       >
         {category}
       </div>
@@ -64,7 +65,7 @@ const CategoryArea = ({ category, onDropItem, items, color }) => {
           width: "150px",
           textAlign: "center",
           fontSize: "16px",
-          color: '#fff',
+          color: "#fff",
         }}
       >
         {items.map((item, index) => (
@@ -86,7 +87,13 @@ const CategoryArea = ({ category, onDropItem, items, color }) => {
   );
 };
 
-const CategorizeStudentQuestion = ({ question, reviewedQuestions, toggleReview, onAnswerChange, onReset }) => {
+const CategorizeStudentQuestion = ({
+  question,
+  reviewedQuestions,
+  toggleReview,
+  onAnswerChange,
+  onReset,
+}) => {
   const [answers, setAnswers] = useState(() => {
     const initialAnswers = {};
     question.categories.forEach((category) => {
@@ -94,9 +101,29 @@ const CategorizeStudentQuestion = ({ question, reviewedQuestions, toggleReview, 
     });
     return initialAnswers;
   });
-
-  const [colors, setColors] = useState(['#d7e8b1', '#f5c4c4'])
+  const [img, setImg] = useState("");
+  const [colors, setColors] = useState(["#d7e8b1", "#f5c4c4"]);
   const [droppedItems, setDroppedItems] = useState([]);
+
+  // useEffect(() => {
+  //   if (question.image !== "") {
+  //     axios
+  //       .get("blob:https://quiz-oc9j2d1ow-naveen199201s-projects.vercel.app/57afc253-5cdb-4de7-88c7-6f45780698eb", { responseType: "blob" })
+  //       .then((blobResponse) => {
+  //         // Ensure the response is valid before creating an Object URL
+  //         if (blobResponse.data instanceof Blob) {
+  //           const blob = blobResponse.data;
+  //           const objectUrl = URL.createObjectURL(blob);
+  //           setImageSrc(objectUrl);
+  //         } else {
+  //           console.error("Response is not a valid Blob");
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching or processing the Blob:", error);
+  //       });
+  //   }
+  // }, [question.image]);
 
   // Handle dropping an item into a category
   const handleDropItem = (category, item) => {
@@ -127,19 +154,29 @@ const CategorizeStudentQuestion = ({ question, reviewedQuestions, toggleReview, 
   return (
     <div style={{ marginBottom: "20px" }}>
       <div className="quiz-action-buttons">
-        <button className="review-button" onClick={() => toggleReview(question._id)}>
-          {reviewedQuestions.includes(question._id) ? <FaBookmark />
-            : <CiBookmark />
-          }
-        </button>
         <button
-          className="reset-button"
-          onClick={() => refreshQuestion()}
+          className="review-button"
+          onClick={() => toggleReview(question._id)}
         >
+          {reviewedQuestions.includes(question._id) ? (
+            <FaBookmark />
+          ) : (
+            <CiBookmark />
+          )}
+        </button>
+        <button className="reset-button" onClick={() => refreshQuestion()}>
           <TfiReload />
         </button>
       </div>
       <h3>{question.questionText}</h3>
+        {question.image !=="" &&(<img
+          src={question.image}
+          alt="question image"
+          height="200px"
+          width="200px"
+        />
+        )}
+
       <div
         style={{
           margin: "20px 0px",
@@ -164,7 +201,7 @@ const CategorizeStudentQuestion = ({ question, reviewedQuestions, toggleReview, 
             key={index}
             color={colors[index]}
             category={category}
-            items={answers[category]} 
+            items={answers[category]}
             onDropItem={handleDropItem}
           />
         ))}

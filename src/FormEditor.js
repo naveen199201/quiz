@@ -20,7 +20,7 @@ const FormEditor = () => {
     const fetchQuestions = async () => {
       const params = { quiz: false };
       try {
-        const response = await axios.get(baseUrl, params);
+        const response = await axios.get(baseUrl, {params});
         console.log(response.data);
         // setQuestions(response.data);
         setClozeQuestions(response?.data.clozeQuestions);
