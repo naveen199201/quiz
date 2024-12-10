@@ -5,6 +5,8 @@ import ComprehensionStudentQuestion from "./ComprehensionStudentQuestion";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import axios from "axios";
+import { ToastContainer,toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "./QuizForm.css";
 
 const QuizForm = ({ questions }) => {
@@ -12,7 +14,7 @@ const QuizForm = ({ questions }) => {
   const [reviewedQuestions, setReviewedQuestions] = useState([]);
   const [questionsCount, setQuestionsCount] =useState(0)
   const [compQuestionsCount, setComprehensionQuestions] = useState(0)
-  const baseUrl = "http://localhost:5000/api/submissions";
+  const baseUrl = "https://backend-eight-virid-92.vercel.app/api/submissions";
   const [answeredQuestionsCount, setAnsweredQuestionsCount] = useState(0);
 
   const handleAnswerChange = (question, answer) => {
@@ -22,17 +24,22 @@ const QuizForm = ({ questions }) => {
     }));
   };
 
-  const  onResetAnswers=(question_id, mcq_id = '') =>{
-    console.log(answers, question_id, mcq_id)
-    // (questions_id, question._id)
-    const newData = { ...answers }
-    if(mcq_id !== ''){
-      delete newData.question_id.mcq_id
-    }else{
-      delete newData[question_id]
+  const onResetAnswers = (question_id, mcq_id = '') => {
+    console.log(answers, question_id, mcq_id);
+    const newData = { ...answers };
+  
+    if (mcq_id !== '') {
+      // Ensure `question_id` exists and is an object before attempting to delete
+      if (newData[question_id] && typeof newData[question_id] === 'object') {
+        delete newData[question_id][mcq_id];
+      }
+    } else {
+      // Delete the entire question's answers
+      delete newData[question_id];
     }
+  
     setAnswers(newData);
-  }
+  };
   const toggleReview = (questionId) => {
     setReviewedQuestions((prev) =>
       prev.includes(questionId)
@@ -60,10 +67,12 @@ const QuizForm = ({ questions }) => {
     return length;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     console.log("Submitted Answers:", answers);
-    axios.post(baseUrl, { data: answers });
-    alert("Your answers have been submitted!");
+    const res = await axios.post(baseUrl, { data: answers });
+    if(res.status){
+      toast.success('Your answers have been submitted!')
+    }
   };
   useEffect(() => {
     let compQuestions = 0;
@@ -98,7 +107,7 @@ const QuizForm = ({ questions }) => {
       <form onSubmit={(e) => e.preventDefault()}>
         {/* Categorize Questions */}
         <div>
-          {questions.categorizeQuestions.map((question, index) => (
+          {questions?.categorizeQuestions?.map((question, index) => (
             <div key={index} className="question-section">
               <h3>Categorize Question {index + 1}</h3>
               <CategorizeStudentQuestion
@@ -117,7 +126,7 @@ const QuizForm = ({ questions }) => {
 
         {/* Cloze Questions */}
         <div>
-          {questions.clozeQuestions.map((question, index) => (
+          {questions?.clozeQuestions?.map((question, index) => (
             <div key={index} className="question-section">
               <h3>Cloze Question {index + 1}</h3>
               <DndProvider backend={HTML5Backend}>
@@ -140,7 +149,7 @@ const QuizForm = ({ questions }) => {
 
         {/* Comprehension Questions */}
         <div>
-          {questions.comprehensionQuestions.map((question, index) => (
+          {questions?.comprehensionQuestions?.map((question, index) => (
             <div key={index} className="question-section">
               <h3>Comprehension {index + 1}</h3>
               <ComprehensionStudentQuestion
@@ -151,8 +160,8 @@ const QuizForm = ({ questions }) => {
                 onAnswerChange={(answer) =>
                   handleAnswerChange(question._id, answer)
                 }
-                onReset={() =>
-                  onResetAnswers(questions_id, question._id)
+                onReset={(mcq_index) =>
+                  onResetAnswers(question._id, mcq_index)
                 }
               />
             </div>
@@ -170,6 +179,18 @@ const QuizForm = ({ questions }) => {
           <p><b>Un Answered Questions:</b> {questionsCount-answeredQuestionsCount}</p>
           <p><b>Mark For Review Questions:</b> {reviewedQuestions.length}</p>
       </div>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   );
 };

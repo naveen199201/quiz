@@ -40,8 +40,8 @@
   .option input[type="radio"] {
     margin: 0;
     cursor: pointer;
-    width: 20px; /* Control the size of the radio button */
-    height: 20px;
+    width: 20px; 
+    /* height: 20px; */
   }
   
   .option label {
@@ -69,24 +69,36 @@
     /* color: #0056b3; */
   }
   
-  .reset-button {
+  /* .reset-button {
     margin-top: 10px;
     padding: 5px 10px;
-    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-  }
+  } */
   
-  .reset-button:hover {
-    background-color: #0056b3;
-  }
+ 
   .paragraph{
     text-align: left;
   }
   .mcq-question{
     text-align: left;
     margin-bottom: 20px;
+  }
+
+  .quiz-action-buttons{
+    display: flex; 
+    justify-content: flex-end;
+    gap: 10px;
+    flex-direction: row;
+  }
+
+  .quiz-action-buttons .review-button,
+  .quiz-action-buttons .reset-button{
+    background-color: transparent;
+    color: #000;
+    font-size: 20px;
+
   }

@@ -1,9 +1,9 @@
 .categorize-question {
   padding: 30px;
   margin-bottom: 20px;
-  background-color: #fff; /* Adds a background color */
-  border-radius: 8px; /* Optional: Rounded corners */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Even shadow on all sides */
+  background-color: #fff; 
+  border-radius: 8px; 
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 h3 {
   text-align: center;
@@ -34,7 +34,6 @@ h3 {
 .add-item input,
 .category input,
 .item input {
-  /* flex-grow: 1; */
   padding: 8px;
   font-size: 14px;
   border: 1px solid #ccc;
@@ -67,7 +66,6 @@ button:disabled {
 
 .category {
   display: flex;
-  /* justify-content: space-between; */
   align-items: center;
   margin: 10px 0;
   gap: 10px;

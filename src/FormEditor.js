@@ -5,16 +5,13 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import CategorizeQuestion from "./CategorizeQuestion";
 import ClozeQuestion from "./ClozeQuestion";
 import ComprehensionQuestion from "./ComprehensionQuestion";
-import { FaPlusCircle } from "react-icons/fa";
-import { PiCopy } from "react-icons/pi";
-import { RiDeleteBinLine } from "react-icons/ri";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
+import { ToastContainer,toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-// const baseUrl = "https://backend-eight-virid-92.vercel.app/api/questions";
-const baseUrl = "http://localhost:5000/api/questions";
+const baseUrl = "https://backend-eight-virid-92.vercel.app/api/questions";
 const FormEditor = () => {
-  // const [questions, setQuestions] = useState({});
   const [clozeQuestions, setClozeQuestions] = useState([]);
   const [categorizeQuestions, setCategorizeQuestions] = useState([]);
   const [comprehensionQuestions, setComprehensionQuestions] = useState([]);
@@ -76,16 +73,19 @@ const FormEditor = () => {
     }
   };
   const deleteQuestion = async (type, id) => {
-    const deleteUrl = "http://localhost:5000/api/remove";
+    const deleteUrl = "https://backend-eight-virid-92.vercel.app/api/remove";
 
     const queryParams = { type, id };
     try {
       const response = await axios.post(deleteUrl,{}, {params:queryParams});
       console.log(response.data);
-      // setQuestions(response.data);
+      if(response.status === 200){
+        toast.success(response.data.message)
+      }
       return true;
     } catch (error) {
-      console.error("Error fetching questions:", error);
+      console.error("Error deleting questions:", error);
+      toast.error(error)
     }
     return false;
   };
@@ -167,14 +167,21 @@ const FormEditor = () => {
       }
     }
   };
-  const handleSubmitQuestions = () => {
+  const handleSubmitQuestions = async() => {
     let postData = {
       clozeQuestions,
       categorizeQuestions,
       comprehensionQuestions,
     };
     console.log(postData);
-    axios.post(baseUrl, postData);
+    const res = await axios.post(baseUrl, postData);
+    if(res.status ===200){
+      toast.success(res.data.message,{
+        position: "top-center", // Change to "top-center" for top middle or "bottom-center" for bottom middle
+      });
+    }else{
+
+    }
   };
 
   const handleSaveQuestion = (index, questionData, type) => {
@@ -258,6 +265,18 @@ const FormEditor = () => {
       </DndProvider>
       {/* <FormPreview questions={questions} /> */}
       <button onClick={handleSubmitQuestions}>Submit</button>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   );
 };

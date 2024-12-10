@@ -1,13 +1,16 @@
 import React from "react";
 import "./ComprehensionStudentQuestion.css";
+import { CiBookmark } from "react-icons/ci";
+import { FaBookmark } from "react-icons/fa";
+import { TfiReload } from "react-icons/tfi";
 
-const ComprehensionStudentQuestion = ({ question, answer,reviewedQuestions,toggleReview, onAnswerChange,onReset }) => {
+const ComprehensionStudentQuestion = ({ question, answer, reviewedQuestions, toggleReview, onAnswerChange, onReset }) => {
   // Function to reset the answer for a specific question
   const handleReset = (index) => {
     const updatedAnswer = { ...answer };
     delete updatedAnswer[index]; // Remove the selected answer for the question
     onAnswerChange(updatedAnswer); // Notify parent about the updated answer
-    onReset();
+    onReset(index);
   };
 
   const handleAnswerSelect = (qindex, selectedOption) => {
@@ -29,17 +32,19 @@ const ComprehensionStudentQuestion = ({ question, answer,reviewedQuestions,toggl
             <p className="mcq-question">
               {qindex + 1}. {mcq.text}
             </p>
-            <div style={{ display:'flex', justifyContent:'flex-end', gap: '20px'}}>
+            <div className="quiz-action-buttons">
 
-            <button onClick={() => toggleReview(question._id)}>
-          {reviewedQuestions.includes(question._id) ? "Unmark" : "Mark for Review"}
-          </button>
-            <button
-              className="refresh-button"
-              onClick={() => handleReset(qindex)}
-            >
-              Reset
-            </button>
+              <button className="review-button" onClick={() => toggleReview(question._id)}>
+                {reviewedQuestions.includes(question._id) ? <FaBookmark />
+                  : <CiBookmark />
+                }
+              </button>
+              <button
+                className="reset-button"
+                onClick={() => handleReset(qindex)}
+              >
+                <TfiReload />
+              </button>
             </div>
             <div className="mcq-options-container">
               {mcq.options.map((option, optionIndex) => (

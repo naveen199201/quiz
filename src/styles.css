@@ -70,3 +70,8 @@
   align-items: center;
   justify-content: center;
 }
+.question-type-selector {
+  display: flex;
+  justify-content: center;
+  gap:10px;
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import FormEditor from "./FormEditor";
 import QuizForm from "./QuizForm";
 import axios from "axios";
+import "./QuizApp.css"
 
 const QuizApp = () => {
   // const baseUrl = "http://localhost:5000/api/questions";

@@ -1,35 +1,12 @@
-import React, { useState, useEffect } from "react";
-import {
-  Editor,
-  EditorState,
-  RichUtils,
-  convertToRaw,
-  ContentState,
-} from "draft-js";
-import { useDrag, useDrop, DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import React, { useState, useEffect, useRef } from "react";
+import ReactQuill from "react-quill";
+import { useDrag, useDrop } from "react-dnd";
 import { FaPlusCircle } from "react-icons/fa";
 import { PiCopy } from "react-icons/pi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FaRegImage } from "react-icons/fa6";
-
-import "draft-js/dist/Draft.css";
+import "quill/dist/quill.snow.css";
 import "./ClozeQuestion.css";
-
-const TextEditor = ({ editorState, setEditorState, toggleUnderline }) => (
-  <div className="text-editor">
-    <div className="toolbar">
-      <button onClick={toggleUnderline}>U</button>
-    </div>
-    <div className="editor-container">
-      <Editor
-        editorState={editorState}
-        onChange={setEditorState}
-        placeholder="Underline the words here to convert them into blanks..."
-      />
-    </div>
-  </div>
-);
 
 // Draggable Option Component
 const DraggableOption = ({ word, index, moveOption, deleteOption }) => {
@@ -50,12 +27,18 @@ const DraggableOption = ({ word, index, moveOption, deleteOption }) => {
 
   return (
     <>
-      <div ref={(node) => drag(drop(node))} className="option">
-        {word}
+      <div ref={(node) => drag(drop(node))}>
+        <div key={index} style={{ display: "flex", alignItems: "center" }}>
+          <input type="checkbox" disabled checked />
+          <span className="cloze-option">{word}</span>
+          <button
+            className="delete-question"
+            onClick={() => deleteOption(word)}
+          >
+            x
+          </button>
+        </div>
       </div>
-      <button className="delete-option" onClick={() => deleteOption(index)}>
-        x
-      </button>
     </>
   );
 };
@@ -68,36 +51,15 @@ const ClozeQuestion = ({
   onAdd,
   onDuplicate,
 }) => {
-  // const [editorState, setEditorState] = useState(() => {
-  //   // Check if questionData.answerText exists, and initialize accordingly
-  //   const contentState = questionData?.answerText
-  //     ? ContentState.createFromText(questionData.answerText) // If there's answerText, initialize with it
-  //     : ContentState.createFromText(""); // If no answerText, initialize with empty text
-  //   return EditorState.createWithContent(contentState);
-  // });
-  console.log(questionData.rawText);
-  const contentState = questionData?.rawText && Array.isArray(questionData.rawText)
-  ? ContentState.createFromBlockArray(questionData.rawText)
-  : ContentState.createFromText("");
-  console.log(contentState);
-  EditorState.createWithContent(contentState);
-  // editorState.createWithContent(contentState);
-  // const contentState = questionData?.rawText
-  //   ? ContentState.createFromBlockArray(questionData.rawText[0])
-  //   : ContentState.createFromText("");
-  const [editorState, setEditorState] = useState(
-    EditorState.createWithContent(contentState)
-  );
-
+  const [answerText, setAnswerText] = useState(questionData.answerText || "");
   const [underlinedWords, setUnderlinedWords] = useState(
     questionData.underlinedWords || []
   );
   const [questionText, setQuestionText] = useState(
     questionData.questionText || ""
   );
-  const [answerText, setAnswerText] = useState(questionData.answerText || "");
   const [image, setImage] = useState(questionData.image || "");
-  const [rawText, setRawText] = useState(questionData.rawText || []);
+  const quillRef = useRef(null);
 
   useEffect(() => {
     handleSave(
@@ -107,89 +69,40 @@ const ClozeQuestion = ({
         underlinedWords,
         answerText,
         image,
-        rawText,
       },
       "cloze"
     );
-  }, [underlinedWords, answerText, questionText, image, rawText]);
+  }, [underlinedWords, answerText, questionText, image]);
 
-  // Function to apply underline
-  const toggleUnderline = () => {
-    const newEditorState = RichUtils.toggleInlineStyle(
-      editorState,
-      "UNDERLINE"
-    );
-    setEditorState(newEditorState);
-    extractUnderlinedWords(newEditorState);
+  const extractUnderlinedWords = () => {
+    const editor = quillRef.current.getEditor();
+    const contents = editor.getContents();
+    const words = [];
+    contents.ops.forEach((op) => {
+      if (op.attributes?.underline) {
+        words.push(op.insert.trim());
+      }
+    });
+    setUnderlinedWords(words);
   };
 
-  // Extract underlined words and update preview text
-  const extractUnderlinedWords = (newEditorState) => {
-    const contentState = newEditorState.getCurrentContent();
-    const rawContent = convertToRaw(contentState);
-    const newUnderlinedWords = [];
-    let updatedPreviewText = rawContent.blocks
-      .map((block) => {
-        let currentIndex = 0;
-        let blockPreview = "";
-
-        block.inlineStyleRanges.forEach((styleRange) => {
-          if (styleRange.style === "UNDERLINE") {
-            if (styleRange.offset > currentIndex) {
-              blockPreview += block.text.substring(
-                currentIndex,
-                styleRange.offset
-              );
-            }
-
-            blockPreview += " ______ ";
-            const word = block.text.substring(
-              styleRange.offset,
-              styleRange.offset + styleRange.length
-            );
-            newUnderlinedWords.push(word);
-
-            currentIndex = styleRange.offset + styleRange.length;
-          }
-        });
-
-        if (currentIndex < block.text.length) {
-          blockPreview += block.text.substring(currentIndex);
+  const renderBlanks = () => {
+    const editor = quillRef.current.getEditor();
+    const contents = editor.getContents();
+    return contents.ops
+      .map((op) => {
+        if (op.attributes?.underline) {
+          return "____ ";
         }
-
-        return blockPreview;
+        return op.insert;
       })
-      .join("\n");
-
-    setUnderlinedWords(Array.from(new Set(newUnderlinedWords)));
-    setQuestionText(updatedPreviewText);
-    setAnswerText(contentState.getPlainText());
-    setRawText(rawContent.blocks);
+      .join("");
   };
 
-  // Update editor state and preview text dynamically
-  // const handleEditorChange = (newEditorState) => {
-  //   setEditorState(newEditorState);
-  //   const contentState = newEditorState.getCurrentContent();
-  //   const plainText = contentState.getPlainText();
-  //   setQuestionText(plainText); // Update preview text with plain text
-  //   extractUnderlinedWords(newEditorState); // Update underlined words
-  // };
-
-  const handleEditorChange = (newEditorState) => {
-    setEditorState(newEditorState);
-
-    // Extract the raw content from the editor state
-    const contentState = newEditorState.getCurrentContent();
-    const plainText = contentState.getPlainText();
-    const rawContent = convertToRaw(contentState); // Get raw content
-    console.log(rawContent);
-
-    // Now, you can save raw content
-    setQuestionText(plainText); // Save raw content (or you can store it wherever necessary)
-    setRawText(rawContent.blocks);
-    // If you want to keep track of underlined words or any other info:
-    extractUnderlinedWords(newEditorState); // Update underlined words if necessary
+  const handleEditorChange = (value) => {
+    setAnswerText(value);
+    extractUnderlinedWords(value);
+    setQuestionText(renderBlanks());
   };
 
   // Move option (drag and drop)
@@ -200,26 +113,31 @@ const ClozeQuestion = ({
     setUnderlinedWords(updatedWords);
   };
 
-  // Delete an option
-  const deleteOption = (index) => {
-    const updatedWords = underlinedWords.filter((_, i) => i !== index);
-    setUnderlinedWords(updatedWords);
+  const deleteOption = (word) => {
+    setUnderlinedWords((prevWords) => prevWords.filter((w) => w !== word));
+    const editor = quillRef.current.getEditor();
+    const plainText = editor.getText();
+    const wordIndex = plainText.indexOf(word);
+    editor.formatText(wordIndex, word.length, "underline", false);
+    const updatedContents = editor.getContents();
+    setAnswerText(updatedContents);
   };
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file)); // Display the image locally
+      setImage(URL.createObjectURL(file));
     }
   };
+
   return (
     <div className="cloze-question-container">
       <div className="cloze-question">
         <h3>Cloze Question</h3>
-        {/* Question Input Box */}
 
         <div className="cloze-question-section">
           <h4>Question</h4>
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <div className="input-group">
               <label htmlFor="Preview" className="input-label">
                 Preview <span className="required-star">*</span>
@@ -232,7 +150,6 @@ const ClozeQuestion = ({
                 placeholder="Preview"
               />
             </div>
-            {/* Image Upload Icon */}
 
             <label
               htmlFor={`${questionIndex}-cloze-image-upload`}
@@ -249,7 +166,7 @@ const ClozeQuestion = ({
             <input
               type="file"
               id={`${questionIndex}-cloze-image-upload`}
-              style={{ display: "none" }} // Hide the file input
+              style={{ display: "none" }}
               accept="image/*"
               onChange={handleImageUpload}
             />
@@ -264,39 +181,45 @@ const ClozeQuestion = ({
               />
             </div>
           )}
+
           <div className="input-group">
             <label htmlFor="Sentence" className="input-label">
               Sentence <span className="required-star">*</span>
             </label>
-            <TextEditor
-              editorState={editorState}
-              setEditorState={handleEditorChange}
-              toggleUnderline={toggleUnderline}
-              multiLine={false}
+            <ReactQuill
+              ref={quillRef}
+              theme="snow"
+              value={answerText}
+              onChange={handleEditorChange}
+              modules={{
+                toolbar: [
+                  ["underline"], // Only allow basic formatting
+                ],
+              }}
+              style={{ height: "150px", marginBottom: "10px" }}
             />
           </div>
-
           {/* Options Section */}
-          <DndProvider backend={HTML5Backend}>
+          {underlinedWords.length > 0 ? (
             <div className="options-section">
               <h4>Options</h4>
-              {underlinedWords.length > 0 ? (
-                underlinedWords.map((word, index) => (
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <DraggableOption
-                      key={`${questionData._id}-${questionIndex}-${index}`}
-                      word={word}
-                      index={index}
-                      moveOption={moveOption}
-                      deleteOption={deleteOption}
-                    />
-                  </div>
-                ))
-              ) : (
-                <p>No options yet. Underline text to create options.</p>
-              )}
+              {underlinedWords.map((word, index) => (
+                <div
+                  key={index}
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  <DraggableOption
+                    word={word}
+                    index={index}
+                    moveOption={moveOption}
+                    deleteOption={deleteOption}
+                  />
+                </div>
+              ))}
             </div>
-          </DndProvider>
+          ) : (
+            <div></div>
+          )}
         </div>
       </div>
       <div className="action-buttons">
@@ -311,7 +234,7 @@ const ClozeQuestion = ({
               underlinedWords,
               answerText,
               image,
-              rawText,
+              rawText: editorText,
             };
             onDuplicate("cloze", newData, questionIndex + 1);
           }}

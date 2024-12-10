@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { CiBookmark } from "react-icons/ci";
+import { FaBookmark } from "react-icons/fa";
+import { TfiReload } from "react-icons/tfi";
 import "./CategorizeStudentQuestion.css";
 
 // Item Component (Draggable)
@@ -15,7 +18,6 @@ const DraggableItem = ({ item, isItemDropped }) => {
 
   // If the item has already been dropped, we won't show it again
   if (isItemDropped) return null;
-
   return (
     <div
       ref={drag}
@@ -33,8 +35,6 @@ const DraggableItem = ({ item, isItemDropped }) => {
     </div>
   );
 };
-
-
 
 // Category Component (Droppable)
 const CategoryArea = ({ category, onDropItem, items, color }) => {
@@ -67,7 +67,6 @@ const CategoryArea = ({ category, onDropItem, items, color }) => {
           color: '#fff',
         }}
       >
-        {/* Display the items dropped into this category */}
         {items.map((item, index) => (
           <div
             key={index}
@@ -87,9 +86,7 @@ const CategoryArea = ({ category, onDropItem, items, color }) => {
   );
 };
 
-// Main CategorizeStudentQuestion Component
-const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, onAnswerChange, onReset }) => {
-  // Initialize the state with empty categories
+const CategorizeStudentQuestion = ({ question, reviewedQuestions, toggleReview, onAnswerChange, onReset }) => {
   const [answers, setAnswers] = useState(() => {
     const initialAnswers = {};
     question.categories.forEach((category) => {
@@ -98,8 +95,7 @@ const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, on
     return initialAnswers;
   });
 
-  const [colors, setColors] = useState(['#d7e8b1','#f5c4c4'])
-  // State to keep track of which items are dropped
+  const [colors, setColors] = useState(['#d7e8b1', '#f5c4c4'])
   const [droppedItems, setDroppedItems] = useState([]);
 
   // Handle dropping an item into a category
@@ -107,7 +103,7 @@ const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, on
     setAnswers((prevAnswers) => {
       const updatedAnswers = { ...prevAnswers };
       updatedAnswers[category].push(item);
-      onAnswerChange(question._id,updatedAnswers); // Trigger the callback to update the parent
+      onAnswerChange(question._id, updatedAnswers); // Trigger the callback to update the parent
       return updatedAnswers;
     });
 
@@ -129,30 +125,21 @@ const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, on
   };
 
   return (
-    <div style={{marginBottom: "20px" }}>
-      <div style={{ display:'flex', justifyContent:'flex-end', gap:'20px'}}>
-      <button onClick={() => toggleReview(question._id)}>
-          {reviewedQuestions.includes(question._id) ? "Unmark" : "Mark for Review"}
-      </button>
-      {/* Reset Button */}
-      <button
-        onClick={refreshQuestion}
-        style={{
-          padding: "10px 20px",
-          border: "none",
-          borderRadius: "5px",
-          backgroundColor: "#007bff",
-          color: "#fff",
-          cursor: "pointer",
-          fontSize: "16px",
-          textAlign: "right"
-        }}
-      >
-        Reset
-      </button>
+    <div style={{ marginBottom: "20px" }}>
+      <div className="quiz-action-buttons">
+        <button className="review-button" onClick={() => toggleReview(question._id)}>
+          {reviewedQuestions.includes(question._id) ? <FaBookmark />
+            : <CiBookmark />
+          }
+        </button>
+        <button
+          className="reset-button"
+          onClick={() => refreshQuestion()}
+        >
+          <TfiReload />
+        </button>
       </div>
       <h3>{question.questionText}</h3>
-
       <div
         style={{
           margin: "20px 0px",
@@ -167,7 +154,7 @@ const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, on
           <DraggableItem
             key={index}
             item={item}
-            isItemDropped={droppedItems.includes(item.answer)} // Check if item is already dropped
+            isItemDropped={droppedItems.includes(item.answer)}
           />
         ))}
       </div>
@@ -177,17 +164,11 @@ const CategorizeStudentQuestion = ({ question,reviewedQuestions,toggleReview, on
             key={index}
             color={colors[index]}
             category={category}
-            items={answers[category]} // Display the answers dropped into this category
+            items={answers[category]} 
             onDropItem={handleDropItem}
           />
         ))}
       </div>
-
-      {/* Debugging: Display Current Answers */}
-      {/* <div style={{ marginTop: "20px" }}>
-        <h4>Answers:</h4>
-        <pre>{JSON.stringify(answers, null, 2)}</pre>
-      </div> */}
     </div>
   );
 };

@@ -18,7 +18,7 @@ const ComprehensionQuestion = ({
 }) => {
   const [paragraph, setParagraph] = useState(questionData.paragraph || "");
   const [questions, setQuestions] = useState(questionData.questions || []);
-  const [rows, setRows] = useState(2); // Initial rows
+  const [rows, setRows] = useState(2); // Initialize rows
   const [image, setImage] = useState(questionData.image || "");
 
   const addQuestion = () => {
@@ -52,8 +52,7 @@ const ComprehensionQuestion = ({
   };
 
   const deleteQuestion = async (index, mcqId) => {
-    const deleteUrl = "http://localhost:5000/api/remove";
-
+    const deleteUrl = "https://backend-eight-virid-92.vercel.app/api/remove";
     const params = {
       type: "comprehension",
       id: questionData._id,
@@ -61,8 +60,6 @@ const ComprehensionQuestion = ({
     };
     try {
       const response = await axios.post(deleteUrl,{}, {params});
-      console.log(response.data);
-      // setQuestions(response.data);
       const updatedQuestions = questions.filter((_, i) => i !== index);
       setQuestions(updatedQuestions);
     } catch (error) {
@@ -91,16 +88,16 @@ const ComprehensionQuestion = ({
   }, [paragraph, questions, image]);
 
   const handleFocus = () => {
-    setRows(10); // Expand to show more rows when focused
+    setRows(10);
   };
 
   const handleBlur = () => {
-    setRows(2); // Collapse back when focus is lost
+    setRows(2);
   };
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file)); // Display the image locally
+      setImage(URL.createObjectURL(file));
     }
   };
   const moveQuestion = (fromIndex, toIndex) => {
@@ -220,7 +217,7 @@ const ComprehensionQuestion = ({
           <input
             type="file"
             id={`${questionIndex}-comprehension-image-upload`}
-            style={{ display: "none" }} // Hide the file input
+            style={{ display: "none" }}
             accept="image/*"
             onChange={handleImageUpload}
           />

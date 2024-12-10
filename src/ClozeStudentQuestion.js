@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { CiBookmark } from "react-icons/ci";
+import { FaBookmark } from "react-icons/fa";
+import { TfiReload } from "react-icons/tfi";
 import "./ClozeStudentQuestion.css";
 
 // **Blank Component**
@@ -34,16 +37,14 @@ const Option = ({ word, isUsed }) => {
   return (
     <div
       ref={drag}
-      className={`option ${isDragging ? "dragging" : ""} ${
-        isUsed ? "used" : ""
-      }`}
+      className={`option ${isDragging ? "dragging" : ""} ${isUsed ? "used" : ""
+        }`}
     >
       {word}
     </div>
   );
 };
 
-// **ClozeStudentQuestion Component**
 const ClozeStudentQuestion = ({
   question,
   reviewedQuestions,
@@ -54,7 +55,7 @@ const ClozeStudentQuestion = ({
   const { questionText, underlinedWords } = question;
 
   // Split the question text to create blanks
-  const textParts = questionText.split("______");
+  const textParts = questionText.split("____");
 
   // State for answers in blanks
   const [answers, setAnswers] = useState(
@@ -74,24 +75,27 @@ const ClozeStudentQuestion = ({
 
   // Refresh the question
   const handleRefresh = () => {
+    console.log('refresh');
     setAnswers(Array(textParts.length - 1).fill(null));
-    onAnswerChange(Array(textParts.length - 1).fill(null)); // Notify parent of reset
+    onAnswerChange(Array(textParts.length - 1).fill(null));
     onReset();
   };
 
   return (
     <div className="cloze-student-question">
-      <div style={{ display: "flex", justifyContent: "flex-end", gap:'20px' }}>
-        <button onClick={() => toggleReview(question._id)}>
-          {reviewedQuestions.includes(question._id)
-            ? "Unmark"
-            : "Mark for Review"}
+      <div className="quiz-action-buttons">
+
+        <button className="review-button" onClick={() => toggleReview(question._id)}>
+          {reviewedQuestions.includes(question._id) ? <FaBookmark />
+            : <CiBookmark />
+          }
         </button>
-        <div className="refresh-container">
-          <button className="refresh-button" onClick={handleRefresh}>
-            Reset
-          </button>
-        </div>
+        <button
+          className="reset-button"
+          onClick={() => handleRefresh()}
+        >
+          <TfiReload />
+        </button>
       </div>
       <div className="options-container">
         {underlinedWords.map((word, index) => (
@@ -113,13 +117,10 @@ const ClozeStudentQuestion = ({
           </React.Fragment>
         ))}
       </div>
-
-      {/* Render Options */}
     </div>
   );
 };
 
-// **Wrapper for Drag-and-Drop Context**
 const ClozeStudentQuestionWrapper = (props) => (
   <DndProvider backend={HTML5Backend}>
     <ClozeStudentQuestion {...props} />

@@ -16,9 +16,8 @@ const CategorizeQuestion = ({
   onAdd,
   onDuplicate,
 }) => {
-  const [categories, setCategories] = useState(questionData.categories || []);
-  // const [categories, setCategories] = useState([""]);
 
+  const [categories, setCategories] = useState(questionData.categories || []);
   const [items, setitems] = useState(questionData.items || []);
   const [newCategory, setNewCategory] = useState("");
   const [newItem, setNewItem] = useState("");
@@ -28,7 +27,6 @@ const CategorizeQuestion = ({
   );
   const [image, setImage] = useState(questionData.image || "");
 
-  // Add new category
   const handleAddCategory = () => {
     if (newCategory.trim() && !categories.includes(newCategory.trim())) {
       setCategories([...categories, newCategory.trim()]);
@@ -36,23 +34,20 @@ const CategorizeQuestion = ({
     }
   };
 
-  // Add new item with category
   const handleAddItem = () => {
     if (newItem.trim() && selectedCategory) {
       setitems([
         ...items,
         {
-          // id: items.length + 1,
           answer: newItem.trim(),
           category: selectedCategory,
         },
       ]);
-      setNewItem(""); // Reset item input
-      setSelectedCategory(""); // Reset category selection
+      setNewItem("");
+      setSelectedCategory("");
     }
   };
 
-  // Handle deleting category
   const handleDeleteCategory = (categoryName) => {
     const updatedCategories = categories.filter(
       (category) => category !== categoryName
@@ -62,13 +57,11 @@ const CategorizeQuestion = ({
     setitems(updatedItems); // Also remove items belonging to deleted category
   };
 
-  // Handle deleting item
   const handleDeleteItem = (itemId) => {
     const updatedItems = items.filter((item) => item._id !== itemId);
     setitems(updatedItems);
   };
 
-  // Handle editing item
   const handleEditItem = (itemId, newName) => {
     const updatedItems = items.map((item) =>
       item._id === itemId ? { ...item, answer: newName } : item
@@ -76,7 +69,6 @@ const CategorizeQuestion = ({
     setitems(updatedItems);
   };
 
-  // Handle changing category for item
   const handleCategoryChangeForItem = (itemId, newCategory) => {
     const updatedItems = items.map((item) =>
       item._id === itemId ? { ...item, category: newCategory } : item
@@ -95,7 +87,7 @@ const CategorizeQuestion = ({
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file)); // Display the image locally
+      setImage(URL.createObjectURL(file));
     }
   };
 
@@ -107,7 +99,6 @@ const CategorizeQuestion = ({
             <div className="question">
               <h3>Question</h3>
             </div>
-
             {/* Categories Section */}
             <div className="categories-section">
               <div style={{ display: "flex", alignItems: "center" }}>
@@ -120,8 +111,6 @@ const CategorizeQuestion = ({
                   }}
                   placeholder="Description (optional)"
                 />
-                {/* Image Upload Icon */}
-
                 <label
                   htmlFor={`${questionIndex}-categorize-image-upload`}
                   className="image-upload-label"
@@ -162,9 +151,6 @@ const CategorizeQuestion = ({
                       const updatedCategories = [...categories];
                       updatedCategories[index] = e.target.value;
                       setCategories(updatedCategories);
-                      // if (index === categories.length - 1 && category !== "") {
-                      //   setCategories([...updatedCategories, ""]);
-                      // }
                     }}
                   />
                   {category && (
@@ -179,7 +165,6 @@ const CategorizeQuestion = ({
               ))}
             </div>
 
-            {/* Add Category */}
             <div className="add-category">
               <input
                 type="text"
@@ -189,15 +174,13 @@ const CategorizeQuestion = ({
               />
               <button onClick={handleAddCategory}>+</button>
             </div>
-
-            {/* Items Section */}
             <h4>Items</h4>
             <div className="items-section">
               {items.map((item, index) => (
                 <div key={item._id} className="item">
                   <input
                     type="text"
-                    value={item.answer} // Use `item.answer` instead of `item.name`
+                    value={item.answer}
                     onChange={(e) => handleEditItem(item._id, e.target.value)}
                   />
                   <button
@@ -225,8 +208,6 @@ const CategorizeQuestion = ({
                 </div>
               ))}
             </div>
-
-            {/* Add Item */}
             <div className="add-item">
               <input
                 type="text"

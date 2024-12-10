@@ -4,6 +4,8 @@
   background-color: #fff; /* Adds a background color */
   border-radius: 8px; /* Optional: Rounded corners */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Even shadow on all sides */
+  width: 100%;
+  padding-bottom: 50px;
 }
 
 .text-editor {
@@ -50,7 +52,7 @@
   margin-top: 15px;
 }
 
-.options-section .option {
+.options-section .cloze-option {
   display: inline-block;
   margin-right: 10px;
   padding: 5px 10px;
@@ -89,7 +91,7 @@
 .option .delete-option:hover {
   background-color: #d9363e;
 }
-.cloze-question-section input {
+.question-section input {
   padding: 8px;
   font-size: 14px;
   border: 1px solid #ccc;
@@ -100,16 +102,19 @@
   margin-bottom: 20px;
   flex-direction: column;
   display: flex;
+  width: 100%;
 }
 
 .input-label {
   font-size: 16px;
   margin-right: 10px;
 }
-
+.input-group input {
+  padding: 10px;
+}
 .required-star {
-  color: red; /* Make the star red */
-  font-size: 18px; /* Adjust the size if needed */
+  color: red; 
+  font-size: 18px;
 }
 .cloze-question-container {
   display: flex;
@@ -124,8 +129,43 @@
   align-items: center;
 }
 
-.cloze-question-section img {
+.question-section img {
   display: block;
   margin-top: 10px;
   max-width: 100%;
+}
+
+input[type="checkbox"] {
+  appearance: none; 
+  width: 20px;
+  height: 20px;
+  border: 2px solid #007bff;
+  border-radius: 3px; 
+  background-color: white;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #007bff; 
+  border-color: #007bff;
+}
+
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 4px;
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 4px 4px 0;
+  transform: rotate(45deg);
+}
+
+.ql-snow * {
+  box-sizing: border-box;
+  font-size: 16px;
+  color: #000;
 }
