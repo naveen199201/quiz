@@ -169,13 +169,13 @@ const CategorizeStudentQuestion = ({
         </button>
       </div>
       <h3>{question.questionText}</h3>
-        {question.image !=="" &&(<img
+        {/* {question.image !=="" &&(<img
           src={question.image}
           alt="question image"
           height="200px"
           width="200px"
         />
-        )}
+        )} */}
 
       <div
         style={{

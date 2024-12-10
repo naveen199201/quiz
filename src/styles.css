@@ -70,8 +70,16 @@
   align-items: center;
   justify-content: center;
 }
+
 .question-type-selector {
   display: flex;
   justify-content: center;
   gap:10px;
+}
+
+.submit-button{
+  display:flex;
+  padding:10px;
+  font-size: 20px;
+  margin: auto;
 }

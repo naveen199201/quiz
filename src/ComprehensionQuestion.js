@@ -79,9 +79,10 @@ const ComprehensionQuestion = ({
   useEffect(() => {
     handleSave(
       questionIndex,
-      {
+      {'_id':questionData._id ,
         paragraph,
         questions,
+        image
       },
       "comprehension"
     );

@@ -13,7 +13,6 @@ const QuizForm = ({ questions }) => {
   const [answers, setAnswers] = useState({});
   const [reviewedQuestions, setReviewedQuestions] = useState([]);
   const [questionsCount, setQuestionsCount] =useState(0)
-  const [compQuestionsCount, setComprehensionQuestions] = useState(0)
   const baseUrl = "https://backend-eight-virid-92.vercel.app/api/submissions";
   const [answeredQuestionsCount, setAnsweredQuestionsCount] = useState(0);
 
@@ -25,26 +24,21 @@ const QuizForm = ({ questions }) => {
   };
 
   const onResetAnswers = (question_id, mcq_id = '') => {
-    console.log(answers, question_id, mcq_id);
     const newData = { ...answers };
-  
     if (mcq_id !== '') {
-      // Ensure `question_id` exists and is an object before attempting to delete
       if (newData[question_id] && typeof newData[question_id] === 'object') {
         delete newData[question_id][mcq_id];
       }
     } else {
-      // Delete the entire question's answers
       delete newData[question_id];
     }
-  
     setAnswers(newData);
   };
   const toggleReview = (questionId) => {
     setReviewedQuestions((prev) =>
       prev.includes(questionId)
-        ? prev.filter((id) => id !== questionId) // Remove if already marked
-        : [...prev, questionId] // Add if not marked
+        ? prev.filter((id) => id !== questionId)
+        : [...prev, questionId] 
     );
   };
   const getNoOfAnswers = () => {
@@ -60,7 +54,7 @@ const QuizForm = ({ questions }) => {
           length += 1;
         }
       } else {
-        length += 0; // For non-array, non-object values
+        length += 0;
       }
       return length;
     });
@@ -85,7 +79,6 @@ const QuizForm = ({ questions }) => {
       questions.categorizeQuestions.length +
       questions.clozeQuestions.length +
       compQuestions;
-      console.log(noOfQuestions)
       setQuestionsCount(noOfQuestions)
   },[questions])
 
@@ -93,17 +86,11 @@ const QuizForm = ({ questions }) => {
     setAnsweredQuestionsCount(getNoOfAnswers);
   },[answers])
 
-  console.log(questionsCount, answeredQuestionsCount);
-  console.log(answers);
-  console.log(reviewedQuestions);
   return (
     <div style={{ display:'flex', justifyContent:'space-around', gap: '20px'}}>
-
     <div className="student-quiz">
       <h1>Quiz</h1>
       <progress value={answeredQuestionsCount} max={questionsCount} />
-
-
       <form onSubmit={(e) => e.preventDefault()}>
         {/* Categorize Questions */}
         <div>
@@ -167,9 +154,7 @@ const QuizForm = ({ questions }) => {
             </div>
           ))}
         </div>
-
-        {/* Submit Button */}
-        <button type="button" onClick={handleSubmit}>
+        <button className="submit-button" type="button" onClick={handleSubmit}>
           Submit Quiz
         </button>
       </form>

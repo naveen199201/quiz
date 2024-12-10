@@ -23,7 +23,7 @@ const QuizApp = () => {
     };
 
     fetchQuestions();
-  }, []); // Empty dependency array ensures this runs once when the component mounts.
+  }, [activeTab]); // Empty dependency array ensures this runs once when the component mounts.
 
   const handleQuestionsUpdate = (updatedQuestions) => {
     setQuestions(updatedQuestions);

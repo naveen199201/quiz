@@ -79,7 +79,7 @@ const CategorizeQuestion = ({
   useEffect(() => {
     handleSave(
       questionIndex,
-      { categories, items, description, image },
+      { '_id':questionData._id ,categories, items, description, image },
       "categorize"
     );
   }, [categories, items, description, image]);
@@ -177,7 +177,7 @@ const CategorizeQuestion = ({
             <h4>Items</h4>
             <div className="items-section">
               {items.map((item, index) => (
-                <div key={item._id} className="item">
+                <div key={index} className="item">
                   <input
                     type="text"
                     value={item.answer}

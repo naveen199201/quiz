@@ -65,6 +65,7 @@ const ClozeQuestion = ({
     handleSave(
       questionIndex,
       {
+        _id: questionData._id,
         questionText,
         underlinedWords,
         answerText,
@@ -75,28 +76,32 @@ const ClozeQuestion = ({
   }, [underlinedWords, answerText, questionText, image]);
 
   const extractUnderlinedWords = () => {
-    const editor = quillRef.current.getEditor();
-    const contents = editor.getContents();
-    const words = [];
-    contents.ops.forEach((op) => {
-      if (op.attributes?.underline) {
-        words.push(op.insert.trim());
-      }
-    });
-    setUnderlinedWords(words);
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const contents = editor.getContents();
+      const words = [];
+      contents.ops.forEach((op) => {
+        if (op.attributes?.underline) {
+          words.push(op.insert.trim());
+        }
+      });
+      setUnderlinedWords(words);
+    }
   };
 
   const renderBlanks = () => {
-    const editor = quillRef.current.getEditor();
-    const contents = editor.getContents();
-    return contents.ops
-      .map((op) => {
-        if (op.attributes?.underline) {
-          return "____ ";
-        }
-        return op.insert;
-      })
-      .join("");
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const contents = editor.getContents();
+      return contents.ops
+        .map((op) => {
+          if (op.attributes?.underline) {
+            return "____ ";
+          }
+          return op.insert;
+        })
+        .join("");
+    }
   };
 
   const handleEditorChange = (value) => {
@@ -115,12 +120,14 @@ const ClozeQuestion = ({
 
   const deleteOption = (word) => {
     setUnderlinedWords((prevWords) => prevWords.filter((w) => w !== word));
-    const editor = quillRef.current.getEditor();
-    const plainText = editor.getText();
-    const wordIndex = plainText.indexOf(word);
-    editor.formatText(wordIndex, word.length, "underline", false);
-    const updatedContents = editor.getContents();
-    setAnswerText(updatedContents);
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const plainText = editor.getText();
+      const wordIndex = plainText.indexOf(word);
+      editor.formatText(wordIndex, word.length, "underline", false);
+      const updatedContents = editor.getContents();
+      setAnswerText(updatedContents);
+    }
   };
 
   const handleImageUpload = (e) => {
