@@ -12,7 +12,7 @@ const QuizApp = () => {
 
   useEffect(() => {
     const fetchQuestions = async () => {
-      const params = { quiz: false };
+      const params = { quiz: true };
       try {
         const response = await axios.get(baseUrl, {params});
         console.log(response.data);
